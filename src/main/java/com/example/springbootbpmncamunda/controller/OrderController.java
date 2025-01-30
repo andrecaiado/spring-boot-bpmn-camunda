@@ -22,8 +22,7 @@ public class OrderController {
 
     @PostMapping()
     public long createOrder(@RequestBody CreateOrderRequestDto createOrderRequestDto) {
-        // Create order
-        HashMap<String, Object> variables = new HashMap<String, Object>();
+        HashMap<String, Object> variables = new HashMap<>();
         variables.put("payload", createOrderRequestDto);
 
         ProcessInstanceEvent processInstance = zeebeClient.newCreateInstanceCommand() //

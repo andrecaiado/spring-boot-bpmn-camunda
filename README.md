@@ -1,6 +1,6 @@
 # Spring Boot BPMN Camunda
 
-A demo project, implemented with Spring Boot, that uses [Camunda Zeebe](https://camunda.com/) workflow engine to execute a simple ordering process.
+A demo project, implemented with Spring Boot, that uses [Camunda Zeebe](https://camunda.com/platform/zeebe/) workflow engine to execute a simple [ordering process](#the-process).
 
 The Camunda Zeebe workflow engine, as well as other Camunda services, is self-managed and run in a docker container. The configuration of these services is done in the [docker-compose.yaml](docker-compose.yaml) file.
 
@@ -58,9 +58,9 @@ The executed process is the following:
 To create a process instance, please refer to the [Start the process](#start-the-process) section.
 
 In order to test the compensation events, a condition was added in the [ProcessPaymentWorker.java](src/main/java/com/example/springbootbpmncamunda/process/ProcessPaymentWorker.java) worker, and is the following:
-- If the total amount is greater than 1000, the worker will throw an exception (ZeebeBpmnError), which will trigger the compensation event.
+- If the total amount is greater than 1000, the worker will throw an exception (ZeebeBpmnError), which will trigger the compensation events.
 
-The 'Ship order' task is a human task, and should be completed in the Camunda Tasklist.
+The 'Ship order' task is a user task and so, it must be completed in the [Camunda Tasklist](#check-and-execute-user-tasks).
 
 ## Try it out
 
@@ -96,15 +96,15 @@ curl --location 'localhost:8080/order' \
 
 ### Check the process status
 
-To check the status of the process, you can use the Camunda Operate. The Operate is available at: [http://localhost:8081](http://localhost:8081)
+To check the status of the process, you can use the Camunda Operate that is available at: [http://localhost:8081](http://localhost:8081)
 
 The default credentials to access Camunda Operate are:
 - Username: demo
 - Password: demo
 
-### Check and execute human tasks
+### Check and execute user tasks
 
-To check the tasks, you can use the Camunda Tasklist. The Tasklist is available at: [http://localhost:8082](http://localhost:8082)
+To check the tasks, you can use the Camunda Tasklist that is available at: [http://localhost:8082](http://localhost:8082)
 
 The default credentials to access Camunda Operate are:
 - Username: demo
