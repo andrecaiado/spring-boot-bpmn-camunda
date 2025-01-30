@@ -67,6 +67,8 @@ In order to test the application and execute the process, you will use the follo
 - Camunda Operate
 - Camunda Tasklist
 
+The credentials to access the Camunda Operate and Camunda Tasklist are specified in the [docker-compose.yaml](docker-compose.yaml) file as KEYCLOAK_USERS_0_USERNAME and KEYCLOAK_USERS_0_PASSWORD.
+
 ### Start the process
 
 To start the process, you need to send a POST request to the `http://localhost:8080/order` endpoint. Bellow is a curl example:
@@ -95,14 +97,6 @@ curl --location 'localhost:8080/order' \
 
 To check the status of the process, you can use the Camunda Operate that is available at: [http://localhost:8081](http://localhost:8081)
 
-The default credentials to access Camunda Operate are:
-- Username: demo
-- Password: demo
-
 ### Check and execute user tasks
 
 To check the tasks, you can use the Camunda Tasklist that is available at: [http://localhost:8082](http://localhost:8082)
-
-The default credentials to access Camunda Operate are:
-- Username: demo
-- Password: demo
