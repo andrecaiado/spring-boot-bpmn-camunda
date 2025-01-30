@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1j2v5sn" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.30.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.6.0">
+  <bpmn:process id="orderProcess" name="OrderProcess" isExecutable="true">
+    <bpmn:boundaryEvent id="Event_1vrdnn5" attachedToRef="TaskReserveItems">
+      <bpmn:compensateEventDefinition id="CompensateEventDefinition_0o7xfo8" />
+    </bpmn:boundaryEvent>
+    <bpmn:startEvent id="StartEventOrderProcess" name="Order received">
+      <bpmn:extensionElements>
+        <zeebe:properties>
+          <zeebe:property name="camundaModeler:exampleOutputJson" value="{&#34;total&#34;:1100,&#34;items&#34;:[{&#34;productId&#34;:&#34;123&#34;,&#34;price&#34;:120,&#34;quantity&#34;:1},{&#34;productId&#34;:&#34;234&#34;,&#34;price&#34;:380,&#34;quantity&#34;:1}]}" />
+        </zeebe:properties>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_16ke8i8</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_16ke8i8" sourceRef="StartEventOrderProcess" targetRef="TaskCreateOrder" />
+    <bpmn:sequenceFlow id="Flow_0ww088o" sourceRef="TaskReserveItems" targetRef="TaskProcessPayment" />
+    <bpmn:intermediateThrowEvent id="Event_1hbnq4h">
+      <bpmn:incoming>Flow_1apmjdn</bpmn:incoming>
+      <bpmn:outgoing>Flow_0xhvtku</bpmn:outgoing>
+      <bpmn:compensateEventDefinition id="CompensateEventDefinition_1e4ayly" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:endEvent id="EndEventOrderProcessFailed" name="Order failed">
+      <bpmn:incoming>Flow_0xhvtku</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="EndEventOrderProcess" name="Order successful">
+      <bpmn:extensionElements>
+        <zeebe:properties>
+          <zeebe:property />
+          <zeebe:property name="camundaModeler:exampleOutputJson" value="{&#34;orderId&#34;: &#34;1&#34;, &#34;shippingId&#34;: &#34;1&#34;}" />
+        </zeebe:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1uxoyju</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0kjbke0" sourceRef="TaskCreateOrder" targetRef="TaskReserveItems" />
+    <bpmn:sequenceFlow id="Flow_0xhvtku" sourceRef="Event_1hbnq4h" targetRef="EndEventOrderProcessFailed" />
+    <bpmn:boundaryEvent id="Event_0xlte8r" attachedToRef="TaskCreateOrder">
+      <bpmn:compensateEventDefinition id="CompensateEventDefinition_1bgz3w3" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_1uxoyju" sourceRef="TaskShipOrder" targetRef="EndEventOrderProcess" />
+    <bpmn:userTask id="TaskShipOrder" name="Ship order">
+      <bpmn:extensionElements>
+        <zeebe:formDefinition formKey="ship-order" />
+        <zeebe:ioMapping>
+          <zeebe:input source="=payload" target="payload" />
+          <zeebe:output source="=shippingId" target="shippingId" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_02g42at</bpmn:incoming>
+      <bpmn:outgoing>Flow_1uxoyju</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="TaskCreateOrder" name="Create order">
+      <bpmn:extensionElements>
+        <zeebe:ioMapping>
+          <zeebe:input source="=payload" target="payload" />
+          <zeebe:output source="=payload" target="payload" />
+        </zeebe:ioMapping>
+        <zeebe:taskDefinition type="createOrder" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_16ke8i8</bpmn:incoming>
+      <bpmn:outgoing>Flow_0kjbke0</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="TaskReserveItems" name="Reserve items (inventory)">
+      <bpmn:extensionElements>
+        <zeebe:ioMapping>
+          <zeebe:input source="=payload" target="payload" />
+          <zeebe:output source="=payload" target="payload" />
+        </zeebe:ioMapping>
+        <zeebe:taskDefinition type="reserveItems" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0kjbke0</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ww088o</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="TaskProcessPayment" name="Process payment">
+      <bpmn:extensionElements>
+        <zeebe:ioMapping>
+          <zeebe:input source="=payload" target="payload" />
+          <zeebe:input source="=paymentAccepted" target="paymentAccepted" />
+          <zeebe:output source="=paymentAccepted" target="paymentAccepted" />
+        </zeebe:ioMapping>
+        <zeebe:taskDefinition type="processPayment" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0ww088o</bpmn:incoming>
+      <bpmn:outgoing>Flow_02g42at</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:boundaryEvent id="Event_18au6cm" attachedToRef="TaskProcessPayment">
+      <bpmn:outgoing>Flow_1apmjdn</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_1x5xh7f" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_1apmjdn" sourceRef="Event_18au6cm" targetRef="Event_1hbnq4h" />
+    <bpmn:sequenceFlow id="Flow_02g42at" sourceRef="TaskProcessPayment" targetRef="TaskShipOrder" />
+    <bpmn:serviceTask id="TaskCancelOrder" name="Cancel order" isForCompensation="true">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="cancelOrder" />
+        <zeebe:ioMapping>
+          <zeebe:input source="=orderId" target="orderId" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="TaskRestoreItemsAvailability" name="Restore items as available" isForCompensation="true">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="restoreItemsAvailability" />
+        <zeebe:ioMapping>
+          <zeebe:input source="=items" target="items" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:association id="Association_0by6kel" associationDirection="One" sourceRef="Event_1vrdnn5" targetRef="TaskRestoreItemsAvailability" />
+    <bpmn:association id="Association_0e8cnr3" associationDirection="One" sourceRef="Event_0xlte8r" targetRef="TaskCancelOrder" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="orderProcess">
+      <bpmndi:BPMNShape id="Event_05ud5mh_di" bpmnElement="StartEventOrderProcess">
+        <dc:Bounds x="142" y="112" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="125" y="155" width="73" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1fstugu_di" bpmnElement="TaskCreateOrder">
+        <dc:Bounds x="230" y="90" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_14d8j8n_di" bpmnElement="TaskReserveItems">
+        <dc:Bounds x="390" y="90" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_050ze0r_di" bpmnElement="TaskProcessPayment">
+        <dc:Bounds x="550" y="90" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0kmxls8_di" bpmnElement="Event_1hbnq4h">
+        <dc:Bounds x="582" y="252" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_09s5ve4_di" bpmnElement="TaskShipOrder">
+        <dc:Bounds x="710" y="90" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0x0xr4h_di" bpmnElement="EndEventOrderProcess">
+        <dc:Bounds x="872" y="112" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="850" y="155" width="83" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_059ewrz_di" bpmnElement="EndEventOrderProcessFailed">
+        <dc:Bounds x="742" y="252" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="731" y="295" width="58" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1vtolbv_di" bpmnElement="TaskCancelOrder">
+        <dc:Bounds x="230" y="230" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ng7ero_di" bpmnElement="TaskRestoreItemsAvailability">
+        <dc:Bounds x="390" y="230" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_0e8cnr3_di" bpmnElement="Association_0e8cnr3">
+        <di:waypoint x="280" y="188" />
+        <di:waypoint x="280" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_0by6kel_di" bpmnElement="Association_0by6kel">
+        <di:waypoint x="440" y="188" />
+        <di:waypoint x="440" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_03n9im9_di" bpmnElement="Event_0xlte8r">
+        <dc:Bounds x="262" y="152" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_013fues_di" bpmnElement="Event_1vrdnn5">
+        <dc:Bounds x="422" y="152" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_10hw7uw_di" bpmnElement="Event_18au6cm">
+        <dc:Bounds x="582" y="152" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_16ke8i8_di" bpmnElement="Flow_16ke8i8">
+        <di:waypoint x="178" y="130" />
+        <di:waypoint x="230" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ww088o_di" bpmnElement="Flow_0ww088o">
+        <di:waypoint x="490" y="130" />
+        <di:waypoint x="550" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0xhvtku_di" bpmnElement="Flow_0xhvtku">
+        <di:waypoint x="618" y="270" />
+        <di:waypoint x="742" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0kjbke0_di" bpmnElement="Flow_0kjbke0">
+        <di:waypoint x="330" y="130" />
+        <di:waypoint x="390" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1uxoyju_di" bpmnElement="Flow_1uxoyju">
+        <di:waypoint x="810" y="130" />
+        <di:waypoint x="872" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1apmjdn_di" bpmnElement="Flow_1apmjdn">
+        <di:waypoint x="600" y="188" />
+        <di:waypoint x="600" y="252" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_02g42at_di" bpmnElement="Flow_02g42at">
+        <di:waypoint x="650" y="130" />
+        <di:waypoint x="710" y="130" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
