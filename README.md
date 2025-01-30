@@ -28,25 +28,20 @@ git clone git@github.com:andrecaiado/spring-boot-bpmn-camunda.git
 cd your-repository-name
 ```
 
-3. Install the dependencies
-```shell
-npm install
-```
-
-4. Create and update the .env file
+3. Create and update the .env file
 ```text
 Create a copy of the `.env.template` and change the name to `.env`
 Update the values (optional)
 ````
 
-5. Start Camunda services with Docker Compose
+4. Start Camunda services with Docker Compose
 ```shell
 docker compose up -d
 ```
 
-6. Run the application
+5. Run the application
 ```shell 
-npm run start:dev
+mvn spring-boot:run
 ```
 
 ## The process
@@ -54,6 +49,8 @@ npm run start:dev
 The executed process is the following:
 
 ![process-order.png](src/main/resources/process-order.png)
+
+**Notes about the process:**
 
 To create a process instance, please refer to the [Start the process](#start-the-process) section.
 
