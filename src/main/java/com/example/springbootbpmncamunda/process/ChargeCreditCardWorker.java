@@ -1,4 +1,4 @@
-package com.example.spring_boot_bpmn_camunda;
+package com.example.springbootbpmncamunda.process;
 
 import io.camunda.zeebe.spring.client.annotation.JobWorker;
 import io.camunda.zeebe.spring.client.annotation.Variable;
@@ -11,6 +11,7 @@ import java.util.Map;
 @Component
 public class ChargeCreditCardWorker {
     private final static    Logger LOG = LoggerFactory.getLogger(ChargeCreditCardWorker.class);
+
     @JobWorker(type = "charge-credit-card")
     public Map<String, Double> chargeCreditCard(@Variable(name = "totalWithTax") Double totalWithTax) {
         LOG.info("charging credit card: {}", totalWithTax);
